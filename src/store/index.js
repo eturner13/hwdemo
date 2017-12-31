@@ -20,9 +20,8 @@ export default new Vuex.Store({
   },
   actions: {},
   mutations: {
-    saveItem (state, item) {
-      let target = state.data.filter(entry => { return entry.id === item.id })
-      target[0] = item
+    saveItem (state, obj) {
+      state.data[obj.index] = obj.data
     }
   },
   strict: debug

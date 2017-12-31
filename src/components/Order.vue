@@ -61,6 +61,16 @@
       padding: 6px 10px
       text-align: left
 
+    .input-amount
+      position: relative
+      right: 6px
+      border: 2px solid $color-mid
+      border-radius: 2px
+      text-align: right
+
+    .input-amount:focus
+      border: 2px solid $color-black
+
 
 </style>
 

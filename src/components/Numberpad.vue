@@ -8,7 +8,8 @@
          @mouseup="stopRapidDecrement"
          @touchstart="startRapidDecrement"
          @touchend="stopRapidDecrement"
-         @touchcancel="stopRapidDecrement">remove</i>
+         @touchcancel="stopRapidDecrement">remove
+      </i>
       <span :class="touched">
         {{ tempAmount }}
       </span>
@@ -19,7 +20,10 @@
          @mouseup="stopRapidIncrement"
          @touchstart="startRapidIncrement"
          @touchend="stopRapidIncrement"
-         @touchcancel="stopRapidIncrement">add</i></div>
+         @touchcancel="stopRapidIncrement">
+        add
+      </i>
+    </div>
     <div class="padrow">
       <span class="padbutton" @click="keypress(1)">
         1
@@ -131,10 +135,14 @@
 
     .pristine
       background: $color-mid
-      padding: 2px
+      padding: 0 3px
+      border-left: 2px solid $color-dark
+      border-right: 2px solid $color-light
 
     .dirty
-      padding: 2px
+      padding: 0 3px
+      border-left: 2px solid $color-light
+      border-right: 2px solid $color-dark
 
 </style>
 
@@ -160,6 +168,7 @@
       ...mapActions([]),
       ...mapMutations([]),
       increment: function () {
+        this.touched = 'dirty'
         this.tempAmount += 1
         this.$emit('changeValue', this.tempAmount)
       },
@@ -176,6 +185,7 @@
       },
       decrement: function () {
         if (this.tempAmount >= 1) {
+          this.touched = 'dirty'
           this.tempAmount -= 1
           this.$emit('changeValue', this.tempAmount)
         }
@@ -237,6 +247,11 @@
     watch: {
       amount: function () {
         this.tempAmount = this.amount
+      },
+      tempAmount: function () {
+        if (this.touched === 'pristine') {
+          this.initialAmount = this.tempAmount
+        }
       }
     }
   }

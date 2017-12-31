@@ -1,33 +1,40 @@
 <template>
   <main id="layout-numberpad">
-    <topbar
-      title="item order"
-      cancel=""
-      :subtitle="item.id + ' ' + item.name">
+    <div :style="{ height: screen }" class="scroll">
+      <topbar
+        title="item order"
+        cancel=""
+        :subtitle="item.id + ' ' + item.name">
       <span slot="column1" id="column-detail-date" class="column">
         Date
       </span>
-      <span slot="column2" class="column">
+        <span slot="column2" class="column">
         Promo
       </span>
-      <span slot="column3" class="column">
+        <span slot="column3" class="column">
         Fixed
       </span>
-      <span slot="column4" class="column">
+        <span slot="column4" class="column">
         Order
       </span>
-    </topbar>
-    <section id="list">
-      <article v-for="(order, index) in data.orders">
-        <order :order="order" :index="index" v-on:selectOrder="selectOrder(index)"></order>
-      </article>
-    </section>
-    <save-button
-      v-if="showSave"
-      v-on:save="save">
-    </save-button>
+      </topbar>
+      <section id="list">
+        <order
+          v-for="(order, index) in data.orders"
+          :class="'order-' + index"
+          :key="index"
+          :order="order"
+          :index="index"
+          v-on:selectOrder="selectOrder(index)">
+        </order>
+      </section>
+      <save-button
+        v-show="showSave"
+        v-on:save="save">
+      </save-button>
+    </div>
     <numberpad
-      class="animated slideUp"
+      :style="{ height: screen }"
       v-if="showNumpad"
       :amount="selectedAmount"
       v-on:next="next"
@@ -58,10 +65,11 @@
         showSave: true,
         showNumpad: false,
         selectedOrder: 0,
-        data: JSON.parse(JSON.stringify(this.item))
+        data: {},
+        screen: document.documentElement.clientHeight + 'px'
       }
     },
-    props: ['item'],
+    props: ['item', 'index'],
     components: {
       Topbar,
       Numberpad,
@@ -78,6 +86,14 @@
         set: function (value) {
           this.data.orders[this.selectedOrder].amount = value
         }
+      },
+      copyData: function () {
+        let copy = JSON.parse(JSON.stringify(this.item))
+        copy.orders = copy.orders.map(order => {
+          order.date = new Date(order.date)
+          return order
+        })
+        return copy
       }
     },
     methods: {
@@ -86,7 +102,7 @@
         'saveItem'
       ]),
       save: function () {
-        this.saveItem(this.data)
+        this.saveItem({ data: this.data, index: this.index })
         this.$router.push({ name: 'List' })
       },
       changeValue: function (value) {
@@ -98,27 +114,37 @@
         this.setFocus(this.selectedOrder)
         this.showSave = false
         this.showNumpad = true
+        this.screen = (document.documentElement.clientHeight / 2) + 'px'
+        setTimeout(() => {
+          document.getElementById('order-' + this.selectedOrder).scrollIntoView(false)
+        }, 100)
       },
       next: function () {
         if (document.getElementById('order-' + (this.selectedOrder + 1))) {
           this.selectedOrder += 1
           this.setFocus(this.selectedOrder)
+          document.getElementById('order-' + this.selectedOrder).scrollIntoView(false)
         } else this.setFocus(this.selectedOrder)
       },
       previous: function () {
         if (document.getElementById('order-' + (this.selectedOrder - 1))) {
           this.selectedOrder -= 1
           this.setFocus(this.selectedOrder)
+          document.getElementById('order-' + this.selectedOrder).scrollIntoView(false)
         } else this.setFocus(this.selectedOrder)
       },
       done: function () {
         document.getElementById('app').focus()
         this.showNumpad = false
         this.showSave = true
+        this.screen = document.documentElement.clientHeight + 'px'
       },
       setFocus: function (index) {
         document.getElementById('order-' + index).focus()
       }
+    },
+    created () {
+      this.data = this.copyData
     },
     mounted () {
       if (!this.item) {
