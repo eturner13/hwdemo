@@ -9,13 +9,11 @@
   @import '../assets/styles/variables/allVariables.sass'
 
   #saveButton
-    position: absolute
-    bottom: 0
-    left: 0
-    right: 0
-    padding: 20px
+    display: flex
+    flex-flow: row nowrap
+    justify-content: center
+    align-items: center
     text-align: center
-    font-weight: 600
     font-size: 14pt
     background: $color-dark
     color: $color-white

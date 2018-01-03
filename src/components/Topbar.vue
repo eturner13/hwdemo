@@ -4,7 +4,7 @@
       <span id="cancel" class="animated fadeIn" @click="returnToRoot" v-show="cancel">
         <i class="material-icons md-36">navigate_before</i>
       </span>
-      <span class="animated fadeIn">
+      <span id="title-text" class="animated fadeIn">
         {{ title.toUpperCase() }}
       </span>
     </section>
@@ -52,7 +52,9 @@
 
       background-color: $color-black
       color: $color-white
-      font-size: 20pt
+
+      #title-text
+        font-size: 20pt
 
       #cancel
         position: absolute

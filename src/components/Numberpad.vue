@@ -1,5 +1,5 @@
 <template>
-  <section id="numberPad">
+  <section class="numberPad">
     <div id="top">
       <i class="material-icons md-36"
          @click="decrement"
@@ -8,9 +8,10 @@
          @mouseup="stopRapidDecrement"
          @touchstart="startRapidDecrement"
          @touchend="stopRapidDecrement"
-         @touchcancel="stopRapidDecrement">remove
+         @touchcancel="stopRapidDecrement">
+        remove
       </i>
-      <span :class="touched">
+      <span id='amount' :class="touched">
         {{ tempAmount }}
       </span>
       <i class="material-icons md-36"
@@ -88,7 +89,7 @@
 
   @import '../assets/styles/variables/allVariables.sass'
 
-  #numberPad
+  .numberPad
     display: flex
     flex-flow: column nowrap
     justify-content: flex-start
@@ -133,6 +134,10 @@
       .padbutton:active
         background: $color-light
 
+    #amount
+      padding: 0 6px
+      transition: .2s
+
     .pristine
       background: $color-mid
       padding: 0 3px
@@ -142,7 +147,7 @@
     .dirty
       padding: 0 3px
       border-left: 2px solid $color-light
-      border-right: 2px solid $color-dark
+      border-right: 2px solid $color-mid
 
 </style>
 
@@ -242,6 +247,25 @@
           this.touched = 'dirty'
           return true
         } else return false
+      },
+      cursorBlink: function () {
+        const cursorEl = document.getElementById('amount')
+        const interval = 500
+        setInterval(() => {
+          if (this.touched === 'pristine') {
+            cursorEl.style.borderRight = '2px solid #DFDFDF'
+            cursorEl.style.borderLeft = '2px solid #DFDFDF'
+            setTimeout(() => {
+              cursorEl.style.borderLeft = '2px solid #616161'
+            }, interval / 2)
+          } else {
+            cursorEl.style.borderLeft = '2px solid #DFDFDF'
+            cursorEl.style.borderRight = '2px solid #DFDFDF'
+            setTimeout(() => {
+              cursorEl.style.borderRight = '2px solid #999999'
+            }, interval / 2)
+          }
+        }, interval)
       }
     },
     watch: {
@@ -253,6 +277,9 @@
           this.initialAmount = this.tempAmount
         }
       }
+    },
+    mounted () {
+      this.cursorBlink()
     }
   }
 </script>

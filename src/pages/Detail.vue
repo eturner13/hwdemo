@@ -1,6 +1,6 @@
 <template>
   <main id="layout-numberpad">
-    <div :style="{ height: screen }" class="scroll">
+    <div :style="{ height: screenTop }" class="scroll">
       <topbar
         title="item order"
         cancel=""
@@ -28,13 +28,14 @@
           v-on:selectOrder="selectOrder(index)">
         </order>
       </section>
-      <save-button
-        v-show="showSave"
-        v-on:save="save">
-      </save-button>
     </div>
+    <save-button
+      :style="{ height: screenBottom }"
+      v-show="showSave"
+      v-on:save="save">
+    </save-button>
     <numberpad
-      :style="{ height: screen }"
+      :style="{ height: screenBottom }"
       v-if="showNumpad"
       :amount="selectedAmount"
       v-on:next="next"
@@ -66,7 +67,9 @@
         showNumpad: false,
         selectedOrder: 0,
         data: {},
-        screen: document.documentElement.clientHeight + 'px'
+        maxHeight: document.documentElement.clientHeight + 'px',
+        screenTop: document.documentElement.clientHeight + 'px',
+        screenBottom: '0px'
       }
     },
     props: ['item', 'index'],
@@ -101,6 +104,14 @@
       ...mapMutations([
         'saveItem'
       ]),
+      selectOrder: function (index) {
+        this.selectedOrder = index
+        this.setFocus(this.selectedOrder)
+        this.openNumpad()
+        setTimeout(() => {
+          document.getElementById('order-' + this.selectedOrder).scrollIntoView(false)
+        }, 100)
+      },
       save: function () {
         this.saveItem({ data: this.data, index: this.index })
         this.$router.push({ name: 'List' })
@@ -108,16 +119,6 @@
       changeValue: function (value) {
         this.selectedAmount = value
         this.setFocus(this.selectedOrder)
-      },
-      selectOrder: function (index) {
-        this.selectedOrder = index
-        this.setFocus(this.selectedOrder)
-        this.showSave = false
-        this.showNumpad = true
-        this.screen = (document.documentElement.clientHeight / 2) + 'px'
-        setTimeout(() => {
-          document.getElementById('order-' + this.selectedOrder).scrollIntoView(false)
-        }, 100)
       },
       next: function () {
         if (document.getElementById('order-' + (this.selectedOrder + 1))) {
@@ -135,12 +136,33 @@
       },
       done: function () {
         document.getElementById('app').focus()
-        this.showNumpad = false
-        this.showSave = true
-        this.screen = document.documentElement.clientHeight + 'px'
+        this.openSave()
       },
       setFocus: function (index) {
         document.getElementById('order-' + index).focus()
+      },
+      openNumpad: function () {
+        this.showSave = false
+        this.screenTop = this.maxHeight
+        this.screenBottom = '0px'
+        this.showNumpad = true
+        while (parseInt(this.screenBottom) < (parseInt(this.maxHeight) * 0.5)) {
+          this.screenTop = (parseInt(this.screenTop) - 1) + 'px'
+          this.screenBottom = (parseInt(this.screenBottom) + 1) + 'px'
+          setTimeout(() => {}, 30)
+        }
+      },
+      openSave: function () {
+        this.showNumpad = false
+        this.screenTop = this.maxHeight
+        this.screenBottom = '0px'
+        this.showSave = true
+        while (parseInt(this.screenBottom) < (parseInt(this.maxHeight) * 0.1)) {
+          this.screenTop = (parseInt(this.screenTop) - 1) + 'px'
+          this.screenBottom = (parseInt(this.screenBottom) + 1) + 'px'
+          setTimeout(() => {
+          }, 30)
+        }
       }
     },
     created () {
@@ -150,6 +172,7 @@
       if (!this.item) {
         this.$router.push({name: 'List'})
       }
+      this.openSave()
       window.scroll(0, 0)
     }
   }
